@@ -61,7 +61,7 @@ class Ui_Dialog(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "关于"))
         self.label.setText(_translate("Dialog", "一 键 评 教"))
-        self.label_2.setText(_translate("Dialog", "版本:1.1"))
+        self.label_2.setText(_translate("Dialog", "版本:1.2"))
         self.label_4.setText(_translate("Dialog", "日期:2016-11-23"))
         self.label_5.setText(_translate("Dialog", "<a href = https://github.com/parallelcc/jwpt>Github</a>"))
         self.label_6.setText(_translate("Dialog", "操作:点击开始,等待片刻"))
