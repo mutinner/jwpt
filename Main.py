@@ -8,7 +8,7 @@ pgyj = [
     "老师对待教学认真负责，语言生动，条理清晰",
     "对待学生严格要求，能够鼓励学生踊跃发言，课堂气氛比较积极热烈。",
     "课堂内容充实，简单明了，使学生能够轻轻松松掌握知识。",
-    "教学过程思路清晰，始终围绕教学目标。"
+    "教学过程思路清晰，始终围绕教学目标。",
     "把握重点，突出难点,能够引导学生开展观察操作比较猜想推理交流等多种形式的活动",
     "课堂教学效果好，语言清晰，能注重学法指导，培养学生的创新能力",
     "教学重难点突出，教学步骤设计合理，由浅入深，循序渐进。",
@@ -57,11 +57,15 @@ def start():
         'wjbz': 'null',
     }
     for x in img:
+        if 'name' not in x.attrs:
+            yield []
+            continue
         value = re.findall('(.*?)#@(.*?)#@(.*?)#@(.*?)#@(.*?)#@(.*)', x.attrs['name'])
         if value:
             value = list(value[0])
         else:
-            return []
+            yield []
+            continue
         info.update(dict(zip(para, value)))
         html = s.post('http://jwpt.tjpu.edu.cn/jxpgXsAction.do', data=info)
         soup = BeautifulSoup(html.text, "html.parser")
@@ -73,6 +77,8 @@ def start():
         choice_data['xumanyzg'] = 'zg'
         choice_data['wjbz'] = ''
         for i in choice:
+            if 'name' not in i.attrs:
+                continue
             choice_data[i.attrs['name']] = '10_1'
         j = random.randint(0, 11)
         choice_data['zgpj'] = pgyj[j].encode('gbk')
