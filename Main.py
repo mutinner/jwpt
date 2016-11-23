@@ -1,10 +1,9 @@
 import requests
 import re
 from bs4 import BeautifulSoup
-import time
 import random
-
 s = requests.session()
+global img
 pgyj = [
     "老师对待教学认真负责，语言生动，条理清晰",
     "对待学生严格要求，能够鼓励学生踊跃发言，课堂气氛比较积极热烈。",
@@ -21,29 +20,48 @@ pgyj = [
 ]
 
 
-def login():
+def load_img():
     html = s.get("http://jwpt.tjpu.edu.cn/validateCodeAction.do?")
     with open('code.jpg', 'wb') as f:
         f.write(html.content)
-    zjh = input("请输入用户名:")
-    mm = input("请输入密码:")
-    yzm = input("请输入验证码:")
+
+
+def login(zjh, mm, yzm):
     info = {'zjh': zjh, 'mm': mm, 'v_yzm': yzm}
     return s.post('http://jwpt.tjpu.edu.cn/loginAction.do', data=info);
 
 
-def start():
+def get_info():
+    html = s.get("http://jwpt.tjpu.edu.cn/menu/top.jsp")
+    result = re.findall("当前用户:(.*?)\((.*?)\)", html.text)
+    if result:
+        return result[0]
+    else:
+        return ['', '']
+
+
+def list_num():
+    global img
     s.get('http://jwpt.tjpu.edu.cn/jxpgXsAction.do?oper=listWj')
     html = s.get('http://jwpt.tjpu.edu.cn/jxpgXsAction.do?pageSize=300')
     soup = BeautifulSoup(html.text, "html.parser")
     img = soup.find_all('img', title='评估')
+    return len(img)
+
+
+def start():
+    global img
     para = ['wjbm', 'bpr', 'bprm', 'wjmc', 'pgnrm', 'pgnr']
     info = {
         'oper': 'wjShow',
         'wjbz': 'null',
     }
     for x in img:
-        value = list(re.findall('(.*?)#@(.*?)#@(.*?)#@(.*?)#@(.*?)#@(.*)', x.attrs['name'])[0])
+        value = re.findall('(.*?)#@(.*?)#@(.*?)#@(.*?)#@(.*?)#@(.*)', x.attrs['name'])
+        if value:
+            value = list(value[0])
+        else:
+            return []
         info.update(dict(zip(para, value)))
         html = s.post('http://jwpt.tjpu.edu.cn/jxpgXsAction.do', data=info)
         soup = BeautifulSoup(html.text, "html.parser")
@@ -59,49 +77,9 @@ def start():
         j = random.randint(0, 11)
         choice_data['zgpj'] = pgyj[j].encode('gbk')
         html = s.post('http://jwpt.tjpu.edu.cn/jxpgXsAction.do?oper=wjpg', data=choice_data)
-        result = re.findall('alert\("(.*?)"\)', html.text)[0]
-        print(info['pgnrm'] + ' ' + info['bprm'] + " " + result)
-        time.sleep(1)
-
-
-if __name__ == '__main__':
-    print("#-----------------------------------------------")
-    print("#  程序:一键评教")
-    print("#  版本:1.0")
-    print("#  日期:2016-11-22")
-    print("#  作者:Parallelc")
-    print("#  操作:输入用户名,密码,验证码")
-    print("#  备注:验证码在当前程序的路径内,名为code.jpg")
-    print("#-----------------------------------------------")
-    print("")
-    flag = 0
-    while flag == 0:
-        try:
-            html = login()
-        except requests.exceptions.ConnectionError as e:
-            print("连接失败!请检查网络")
-            break
-        except Exception as e:
-            print("发生错误!")
-            print(e)
-            break
+        result = re.findall('alert\("(.*?)"\)', html.text)
+        if result:
+            result = result[0]
         else:
-            soup = BeautifulSoup(html.text, "html.parser")
-            error = soup.find_all('td', {'class': "errorTop"})
-            if error:
-                print(error[0].get_text())
-            else:
-                print("登录成功!")
-                flag = 1
-    if flag == 1:
-        try:
-            start()
-        except requests.exceptions.ConnectionError as e:
-            print("连接失败!请检查网络")
-        except Exception as e:
-            print("发生错误!")
-            print(e)
-        else:
-            print("评估完成!")
-print("程序将在60s后关闭...")
-time.sleep(60)
+            result = "未知"
+        yield [info['pgnrm'], ' ', info['bprm'], ' ', result, "\n"]
