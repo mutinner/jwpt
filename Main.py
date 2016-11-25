@@ -76,6 +76,6 @@ if __name__ == "__main__":
     ui.login.clicked.connect(try_go)
     ui1.logout.triggered.connect(logout)
     ui1.info_2.triggered.connect(widget2.show)
-    ui2.label_2.setText(ui2.label_2.text() + version)
+    ui2.label_4.setText(ui2.label_4.text() + version)
 
     sys.exit(app.exec_())
