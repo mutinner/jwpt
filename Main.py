@@ -12,7 +12,7 @@ app = QtWidgets.QApplication(sys.argv)
 widget = QtWidgets.QWidget()
 widget1 = QtWidgets.QMainWindow()
 widget2 = QtWidgets.QDialog()
-version = '1.2'
+version = '1.3'
 
 
 def upgrade():
@@ -75,11 +75,12 @@ if __name__ == "__main__":
 
     widget.show()
     if upgrade():
-        reply = QtWidgets.QMessageBox.question(None, '更新', '\n有新版本,是否更新?',
+        reply = QtWidgets.QMessageBox.question(None, '更新', '有新版本,是否更新?',
                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
                                                QtWidgets.QMessageBox.Yes)
         if reply == QtWidgets.QMessageBox.Yes:
             webbrowser.open("http://www.parallelc.cn/pj.zip")
+            sys.exit()
 
     ui.login.clicked.connect(try_go)
     ui1.logout.triggered.connect(logout)
