@@ -142,6 +142,9 @@ class Ui_MainWindow(object):
             self.info.append("发生错误!请重试")
             self.info.append(str(e))
         else:
+            if num == 0:
+                self.progressBar.setRange(0, 100)
+                num = 100
             self.progressBar.setValue(num)
             self.info.append("评估完成!")
-            self.info.append("请自行检查是否全部评估,如有未知结果请重试")
+            self.info.append("请自行检查是否全部评估,如有未知结果或未评估的请重试")
