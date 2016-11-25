@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import Main
+import Handle
 import requests
 
 
@@ -9,6 +9,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(398, 331)
+        MainWindow.setFixedSize(MainWindow.width(), MainWindow.height())
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.user_name = QtWidgets.QLabel(self.centralwidget)
@@ -35,6 +36,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(9)
         self.info.setFont(font)
+        # 禁止编辑
         self.info.setFocusPolicy(QtCore.Qt.NoFocus)
         cursor = self.info.textCursor()
         cursor.movePosition(QtGui.QTextCursor.End)
@@ -98,10 +100,10 @@ class Ui_MainWindow(object):
 
     def start(self):
         try:
-            num = Main.list_num()
+            num = Handle.list_num()
             self.progressBar.setRange(0, num)
             k = 0
-            for i in Main.start():
+            for i in Handle.start():
                 for j in i:
                     self.info.insertPlainText(j)
                 k += 1

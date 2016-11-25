@@ -1,17 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import Main
-import Start
-import requests
-import re
-import sys
-import info
-
-app = QtWidgets.QApplication(sys.argv)
-widget = QtWidgets.QWidget()
-widget1 = QtWidgets.QMainWindow()
-widget2 = QtWidgets.QDialog()
+import Handle
 
 
 class MyLabel(QtWidgets.QLabel):
@@ -24,7 +14,7 @@ class MyLabel(QtWidgets.QLabel):
     def show_img(self):
         self.setText("加载中...")
         try:
-            Main.load_img()
+            Handle.load_img()
         except Exception:
             self.setText("加载失败")
         else:
@@ -36,6 +26,7 @@ class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(400, 309)
+        Form.setFixedSize(Form.width(), Form.height())
         self.label = QtWidgets.QLabel(Form)
         self.label.setGeometry(QtCore.QRect(55, 95, 60, 20))
         font = QtGui.QFont()
@@ -84,6 +75,7 @@ class Ui_Form(object):
         font = QtGui.QFont()
         font.setPointSize(9)
         pa = QtGui.QPalette()
+        # 红色
         pa.setColor(QtGui.QPalette.WindowText, QtCore.Qt.red)
         self.warn.setFont(font)
         self.warn.setPalette(pa)
@@ -94,6 +86,7 @@ class Ui_Form(object):
         font = QtGui.QFont()
         font.setPointSize(11)
         self.password.setFont(font)
+        # 密文
         self.password.setEchoMode(QtWidgets.QLineEdit.Password)
         self.password.setObjectName("password")
         self.user_name = QtWidgets.QLineEdit(Form)
@@ -108,14 +101,14 @@ class Ui_Form(object):
         font.setPointSize(11)
         self.yzm.setFont(font)
         self.yzm.setObjectName("yzm")
+
         self.img = MyLabel(Form)
         self.img.setGeometry(QtCore.QRect(250, 190, 90, 30))
         self.img.setContextMenuPolicy(QtCore.Qt.NoContextMenu)
         self.img.setText("点击获取")
-
-        self.login.clicked.connect(self.try_go)
-        self.reset.clicked.connect(self.clear)
         self.img.setObjectName("img")
+
+        self.reset.clicked.connect(self.clear)
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -145,41 +138,3 @@ class Ui_Form(object):
         self.img.setText("点击获取")
         self.warn.setText("")
 
-    def try_go(self):
-        try:
-            html = Main.login(self.user_name.text(), self.password.text(), self.yzm.text())
-        except requests.exceptions.ConnectionError:
-            self.warn.setText("连接失败!请检查网络")
-        except Exception as e:
-            self.warn.setText("发生错误!" + e)
-        else:
-            error = re.findall('<strong><font color="#990000">(.*?)</font></strong><br>', html.text)
-            if error:
-                self.warn.setText(error[0])
-                self.img.show_img()
-            else:
-                widget.close()
-                ui1.clear()
-                ui1.progressBar.setValue(0)
-                info = Main.get_info()
-                ui1.number.setText(info[0])
-                ui1.user_name.setText(info[1])
-                widget1.show()
-
-
-def change():
-    widget1.close()
-    ui.clear()
-    widget.show()
-
-if __name__ == "__main__":
-    ui = Ui_Form()
-    ui.setupUi(widget)
-    widget.show()
-    ui1 = Start.Ui_MainWindow()
-    ui1.setupUi(widget1)
-    ui1.logout.triggered.connect(change)
-    ui2 = info.Ui_Dialog()
-    ui2.setupUi(widget2)
-    ui1.info_2.triggered.connect(widget2.show)
-    sys.exit(app.exec_())
