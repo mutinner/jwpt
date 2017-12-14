@@ -70,7 +70,7 @@ def start():
         info.update(dict(zip(para, value)))
         html = s.post('http://jwpt.tjpu.edu.cn/jxpgXsAction.do', data=info)
         soup = BeautifulSoup(html.text, "html.parser")
-        choice = soup.find_all('input', value='10_1')
+        choice = soup.find_all('input', type='radio')
         choice_data = dict()
         choice_data['pgnr'] = info['pgnr']
         choice_data['wjbm'] = info['wjbm']
@@ -80,7 +80,7 @@ def start():
         for i in choice:
             if 'name' not in i.attrs:
                 continue
-            choice_data[i.attrs['name']] = '10_1'
+            choice_data[i.attrs['name']] = i.attrs['value'].split('_')[0] + '_1'
         j = random.randint(0, 11)
         choice_data['zgpj'] = comment[j].encode('gbk')
         html = s.post('http://jwpt.tjpu.edu.cn/jxpgXsAction.do?oper=wjpg', data=choice_data)
